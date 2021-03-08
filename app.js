@@ -30,8 +30,32 @@ mongoose.connect('mongodb://localhost:27017/voicedb', {
   console.log('haha',e);
 })
 
- app.use('/twilioNumber',twilioRouter)
+ app.use('/twilioNumber',
+  authentication
+ ,twilioRouter)
 
+ async function authentication(req,res,next)
+ {
+     const { headers } = req;
+    
+     if(headers)
+     {
+         if(req.headers["x-auth-token"] === process.env.CUSTOM_TOKEN){
+          next();
+         }
+         else{
+             res.status(400).json({
+                 message: "User Unauthorized",
+               });
+         }
+        
+     }
+     else{
+         res.status(400).json({
+             message: "User Unauthorized",
+           });
+     }
+ }
 
 // var test=[
 //   {name:"umer",id:"1"},
@@ -103,4 +127,4 @@ app.use(function(err, req, res, next) {
   res.render('error');
 });
 
-module.exports = app;
+module.exports = app;s
